@@ -102,11 +102,40 @@ def init_db() -> None:
                 technique_stix_id TEXT NOT NULL,
                 PRIMARY KEY (actor_stix_id, technique_stix_id)
             );
+
+            CREATE TABLE IF NOT EXISTS actor_targets (
+                id INTEGER PRIMARY KEY,
+                actor_stix_id TEXT NOT NULL,
+                target_name TEXT,
+                target_type TEXT,
+                target_sector TEXT,
+                UNIQUE(actor_stix_id, target_name)
+            );
         """)
         # Migrate existing feed_cache tables that predate Phase 2 columns.
         for col, typedef in [("threat_type", "TEXT"), ("malware_family", "TEXT")]:
             try:
                 conn.execute(f"ALTER TABLE feed_cache ADD COLUMN {col} {typedef}")
+            except Exception:
+                pass
+        # Migrate news_cache — add categories column (Phase 4b).
+        try:
+            conn.execute("ALTER TABLE news_cache ADD COLUMN categories TEXT DEFAULT ''")
+        except Exception:
+            pass
+        # Migrate reports — add 8 new fields (Phase 4b).
+        for col, typedef in [
+            ("tlp", "TEXT DEFAULT 'WHITE'"),
+            ("confidence", "TEXT DEFAULT 'UNASSESSED'"),
+            ("date_from", "TEXT"),
+            ("date_to", "TEXT"),
+            ("affected_sectors", "TEXT"),
+            ("named_victims", "TEXT"),
+            ("detection_notes", "TEXT"),
+            ("references_json", "TEXT"),
+        ]:
+            try:
+                conn.execute(f"ALTER TABLE reports ADD COLUMN {col} {typedef}")
             except Exception:
                 pass
 

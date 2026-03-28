@@ -12,8 +12,8 @@ router = APIRouter(tags=["news"])
 
 
 @router.get("/news")
-async def get_news(source: str = None, limit: int = 60, offset: int = 0):
-    return news_svc.query_news(source=source, limit=limit, offset=offset)
+async def get_news(source: str = None, category: str = None, limit: int = 60, offset: int = 0):
+    return news_svc.query_news(source=source, category=category, limit=limit, offset=offset)
 
 
 @router.post("/news/refresh")

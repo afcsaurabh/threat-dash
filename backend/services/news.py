@@ -22,6 +22,22 @@ from backend.database import get_connection
 
 TIMEOUT = httpx.Timeout(20.0)
 
+CATEGORY_PATTERNS = {
+    "ransomware":   r"ransomware|extortion|lockbit|blackcat|cl0p|dark web leak",
+    "nation-state": r"\bapt\b|nation.state|espionage|state.sponsored|lazarus|apt28|apt41|sandworm",
+    "vulnerabilities": r"cve-\d|zero.day|vulnerability|patch tuesday|exploit|rce\b|lpe\b",
+    "data-breach":  r"breach|data leak|credential|stolen|exposed database",
+    "government":   r"\bcisa\b|\bnist\b|executive order|legislation|sanctions|advisory",
+    "incident":     r"incident|post.mortem|forensic|attributed|investigation",
+}
+
+
+def _tag_categories(title: str, summary: str) -> str:
+    import re
+    text = (title + " " + summary).lower()
+    matched = [cat for cat, pattern in CATEGORY_PATTERNS.items() if re.search(pattern, text)]
+    return ",".join(matched) if matched else "uncategorized"
+
 # Algolia HN search — queries recent security stories
 HN_ALGOLIA = (
     "https://hn.algolia.com/api/v1/search"
@@ -62,11 +78,12 @@ def _store_articles(articles: list[dict]) -> int:
     with get_connection() as conn:
         for a in articles:
             try:
+                categories = _tag_categories(a.get("title", ""), a.get("summary", ""))
                 conn.execute(
                     """
                     INSERT OR IGNORE INTO news_cache
-                        (article_id, title, url, source, published_at, summary, score, author)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        (article_id, title, url, source, published_at, summary, score, author, categories)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         a["article_id"],
@@ -77,6 +94,7 @@ def _store_articles(articles: list[dict]) -> int:
                         a.get("summary", ""),
                         a.get("score", 0),
                         a.get("author", ""),
+                        categories,
                     ),
                 )
                 count += 1
@@ -176,13 +194,17 @@ async def refresh_all() -> dict:
     }
 
 
-def query_news(source: str = None, limit: int = 60, offset: int = 0) -> dict:
+def query_news(source: str = None, category: str = None, limit: int = 60, offset: int = 0) -> dict:
     conditions: list[str] = []
     params: list = []
 
     if source:
         conditions.append("source = ?")
         params.append(source)
+
+    if category and category != "all":
+        conditions.append("categories LIKE ?")
+        params.append(f"%{category}%")
 
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
@@ -193,7 +215,7 @@ def query_news(source: str = None, limit: int = 60, offset: int = 0) -> dict:
 
         rows = conn.execute(
             f"""
-            SELECT article_id, title, url, source, published_at, summary, score, author, fetched_at
+            SELECT article_id, title, url, source, published_at, summary, score, author, fetched_at, categories
             FROM news_cache {where}
             ORDER BY fetched_at DESC, score DESC
             LIMIT ? OFFSET ?

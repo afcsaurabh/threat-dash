@@ -16,6 +16,34 @@ ATTCK_BUNDLE_URL = (
     "enterprise-attack/enterprise-attack.json"
 )
 
+COUNTRY_LOOKUP = {
+    "APT1": "CN", "APT10": "CN", "APT12": "CN", "APT16": "CN",
+    "APT17": "CN", "APT18": "CN", "APT19": "CN", "APT28": "RU",
+    "APT29": "RU", "APT30": "CN", "APT32": "VN", "APT33": "IR",
+    "APT34": "IR", "APT37": "KP", "APT38": "KP", "APT39": "IR",
+    "APT40": "CN", "APT41": "CN", "Axiom": "CN", "Charming Kitten": "IR",
+    "Cozy Bear": "RU", "Fancy Bear": "RU", "Goblin Panda": "CN",
+    "Kimsuky": "KP", "Lazarus Group": "KP", "Leviathan": "CN",
+    "Machete": "VZ", "Magic Hound": "IR", "Mustang Panda": "CN",
+    "OilRig": "IR", "Patchwork": "IN", "Sandworm Team": "RU",
+    "Scarlet Mimic": "CN", "Silent Chollima": "KP", "TA505": "RU",
+    "TA551": "UA", "Temp.Veles": "RU", "The Dukes": "RU",
+    "Threat Group-3390": "CN", "Turla": "RU", "WIRTE": "PS",
+    "Winnti Group": "CN", "Wizard Spider": "RU", "ZIRCONIUM": "CN",
+    "Equation": "US", "Elderwood": "CN", "FIN7": "RU", "FIN8": "RU",
+    "LAPSUS$": "BR", "Scattered Spider": "UK",
+}
+
+
+def _infer_country(g: dict) -> str | None:
+    name = g.get("name", "")
+    if name in COUNTRY_LOOKUP:
+        return COUNTRY_LOOKUP[name]
+    for alias in g.get("aliases", []):
+        if alias in COUNTRY_LOOKUP:
+            return COUNTRY_LOOKUP[alias]
+    return None
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -84,7 +112,7 @@ async def refresh_attck() -> dict:
                     g["name"],
                     json.dumps(g.get("aliases", [])),
                     (g.get("description") or "")[:2000],
-                    None,
+                    COUNTRY_LOOKUP.get(g["name"]) or _infer_country(g),
                 ),
             )
 
@@ -119,6 +147,31 @@ async def refresh_attck() -> dict:
                     VALUES (?, ?)
                     """,
                     (o["source_ref"], o["target_ref"]),
+                )
+
+        # Parse identity objects and targets relationships
+        identities = {o["id"]: o for o in objects if o["type"] == "identity"}
+        conn.execute("DELETE FROM actor_targets")
+        for o in objects:
+            if (
+                o.get("type") == "relationship"
+                and o.get("relationship_type") == "targets"
+                and o.get("source_ref") in groups
+                and o.get("target_ref") in identities
+            ):
+                identity = identities[o["target_ref"]]
+                conn.execute(
+                    """
+                    INSERT OR IGNORE INTO actor_targets
+                        (actor_stix_id, target_name, target_type, target_sector)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (
+                        o["source_ref"],
+                        identity.get("name", ""),
+                        identity.get("identity_class", ""),
+                        ",".join(identity.get("sectors", [])),
+                    ),
                 )
 
     return {
