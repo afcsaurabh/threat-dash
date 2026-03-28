@@ -6,6 +6,7 @@ GET  /api/feeds/stats
 """
 
 from fastapi import APIRouter
+from backend.services import feeds as feed_svc
 
 router = APIRouter(tags=["feeds"])
 
@@ -16,15 +17,20 @@ async def get_feeds(
     source: str = None,
     since: str = None,
     confidence: int = None,
+    limit: int = 100,
+    offset: int = 0,
 ):
-    return {"feed": [], "total": 0}
+    return feed_svc.query_feeds(
+        type=type, source=source, since=since,
+        confidence=confidence, limit=limit, offset=offset,
+    )
 
 
 @router.post("/feeds/refresh")
 async def refresh_feeds():
-    return {"status": "Phase 2 not yet implemented"}
+    return await feed_svc.refresh_all()
 
 
 @router.get("/feeds/stats")
 async def get_feed_stats():
-    return {"threatfox": 0, "urlhaus": 0, "feodo": 0, "last_refresh": None}
+    return feed_svc.get_feed_stats()

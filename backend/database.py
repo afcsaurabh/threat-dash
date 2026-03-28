@@ -1,6 +1,6 @@
 """
 SQLite connection and schema initialization.
-Tables: ioc_history, ioc_tags, feed_cache, actor_notes, reports
+Tables: ioc_history, ioc_tags, feed_cache, actor_notes, reports, news_cache
 """
 
 import sqlite3
@@ -36,6 +36,8 @@ def init_db() -> None:
                 ioc_type TEXT,
                 source TEXT,
                 confidence INTEGER,
+                threat_type TEXT,
+                malware_family TEXT,
                 first_seen TIMESTAMP,
                 ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(ioc, source)
@@ -61,7 +63,26 @@ def init_db() -> None:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS news_cache (
+                id INTEGER PRIMARY KEY,
+                article_id TEXT UNIQUE,
+                title TEXT NOT NULL,
+                url TEXT,
+                source TEXT NOT NULL,
+                published_at TEXT,
+                summary TEXT,
+                score INTEGER DEFAULT 0,
+                author TEXT,
+                fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
         """)
+        # Migrate existing feed_cache tables that predate Phase 2 columns.
+        for col, typedef in [("threat_type", "TEXT"), ("malware_family", "TEXT")]:
+            try:
+                conn.execute(f"ALTER TABLE feed_cache ADD COLUMN {col} {typedef}")
+            except Exception:
+                pass
 
 
 @contextmanager

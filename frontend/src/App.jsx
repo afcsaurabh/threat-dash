@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Enrich from './pages/Enrich'
 import Feeds from './pages/Feeds'
+import News from './pages/News'
 import Actors from './pages/Actors'
 import Reports from './pages/Reports'
 
@@ -17,6 +18,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Enrich />} />
             <Route path="/feeds" element={<Feeds />} />
+            <Route path="/news" element={<News />} />
             <Route path="/actors" element={<Actors />} />
             <Route path="/reports" element={<Reports />} />
           </Routes>

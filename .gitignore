@@ -1,0 +1,35 @@
+# Local session and AI-facing planning files (not for the repo)
+context.md
+REQUIREMENTS.md
+ARCHITECTURE.md
+UI_DESIGN.md
+DECISIONS.md
+SPEC.md
+research_*.md
+*.local.md
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# SQLite database (local data, not committed)
+*.db
+
+# Node
+node_modules/
+frontend/dist/
+frontend/node_modules/
+
+# OS
+.DS_Store
