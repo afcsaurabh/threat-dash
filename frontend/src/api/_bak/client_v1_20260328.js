@@ -66,14 +66,9 @@ export const api = {
   getNewsStats: () => request('/api/news/stats'),
 
   // Phase 3 — Actors
-  getActorStats: () => request('/api/actors/stats'),
-  getActors: (params = {}) => {
-    const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== ''))
-    return request(`/api/actors${qs.toString() ? '?' + qs : ''}`)
-  },
+  getActors: () => request('/api/actors'),
   getActor: (id) => request(`/api/actors/${id}`),
   getNavigator: (id) => request(`/api/actors/${id}/navigator`),
-  refreshActors: () => request('/api/actors/refresh', { method: 'POST' }),
   saveNotes: (id, notes) =>
     request(`/api/actors/${id}/notes`, { method: 'POST', body: JSON.stringify({ notes }) }),
 

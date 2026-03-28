@@ -76,32 +76,6 @@ def init_db() -> None:
                 author TEXT,
                 fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
-
-            CREATE TABLE IF NOT EXISTS actor_groups (
-                stix_id TEXT PRIMARY KEY,
-                external_id TEXT UNIQUE,
-                name TEXT NOT NULL,
-                aliases TEXT,
-                description TEXT,
-                country TEXT,
-                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS attack_techniques (
-                stix_id TEXT PRIMARY KEY,
-                technique_id TEXT UNIQUE,
-                name TEXT NOT NULL,
-                description TEXT,
-                tactics TEXT,
-                platforms TEXT,
-                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS actor_techniques (
-                actor_stix_id TEXT NOT NULL,
-                technique_stix_id TEXT NOT NULL,
-                PRIMARY KEY (actor_stix_id, technique_stix_id)
-            );
         """)
         # Migrate existing feed_cache tables that predate Phase 2 columns.
         for col, typedef in [("threat_type", "TEXT"), ("malware_family", "TEXT")]:

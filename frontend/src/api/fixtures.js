@@ -161,13 +161,95 @@ export const fixtures = {
     },
   },
 
+  '/api/actors/stats': {
+    groups: 160,
+    techniques: 641,
+    last_updated: '2026-03-27T09:00:00Z',
+  },
+
   '/api/actors': {
     actors: [
-      { id: 'G0007', name: 'APT28', aliases: ['Fancy Bear', 'Sofacy'], country: 'Russia' },
-      { id: 'G0032', name: 'Lazarus Group', aliases: ['HIDDEN COBRA'], country: 'DPRK' },
-      { id: 'G0096', name: 'APT41', aliases: ['BARIUM', 'Winnti'], country: 'China' },
+      {
+        id: 'G0007', external_id: 'G0007', name: 'APT28',
+        aliases: ['Fancy Bear', 'Sofacy', 'IRON TWILIGHT', 'Sednit'],
+        country: 'Russia',
+        description: 'APT28 is a threat group that has been attributed to Russia\'s General Staff Main Intelligence Directorate (GRU) 85th Main Special Service Center (GTsSS) military unit 26165. This group has been active since at least 2004.',
+        technique_count: 68,
+      },
+      {
+        id: 'G0032', external_id: 'G0032', name: 'Lazarus Group',
+        aliases: ['HIDDEN COBRA', 'Zinc', 'Labyrinth Chollima'],
+        country: 'DPRK',
+        description: 'Lazarus Group is a threat group that has been attributed to the North Korean government. The group has been active since at least 2009 and was responsible for the November 2014 destructive wiper attack against Sony Pictures Entertainment.',
+        technique_count: 57,
+      },
+      {
+        id: 'G0096', external_id: 'G0096', name: 'APT41',
+        aliases: ['BARIUM', 'Winnti', 'Double Dragon', 'Bronze Atlas'],
+        country: 'China',
+        description: 'APT41 is a threat group that researchers have assessed as Chinese state-sponsored espionage group that also conducts financially-motivated operations. The group has been active since at least 2012.',
+        technique_count: 130,
+      },
     ],
     total: 3,
+  },
+
+  '/api/actors/G0007': {
+    id: 'G0007', external_id: 'G0007', name: 'APT28',
+    aliases: ['Fancy Bear', 'Sofacy', 'IRON TWILIGHT', 'Sednit', 'Pawn Storm'],
+    country: 'Russia',
+    description: 'APT28 is a threat group attributed to Russia\'s GRU 85th Main Special Service Center (GTsSS), military unit 26165. Active since at least 2004, APT28 targets government, military, and security organizations primarily in Europe and NATO member states. Known for spear-phishing campaigns, credential harvesting, and custom implants including X-Agent and Sofacy.',
+    notes: '',
+    techniques: [
+      { id: 'T1566', name: 'Phishing', tactics: ['initial-access'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT28 uses spear-phishing emails with malicious attachments or links to gain initial access.' },
+      { id: 'T1078', name: 'Valid Accounts', tactics: ['defense-evasion', 'initial-access', 'persistence', 'privilege-escalation'], platforms: ['Windows', 'Linux', 'macOS'], description: 'APT28 uses credentials obtained through credential dumping or phishing to move laterally.' },
+      { id: 'T1190', name: 'Exploit Public-Facing Application', tactics: ['initial-access'], platforms: ['Linux', 'Windows', 'macOS'], description: 'APT28 has exploited vulnerabilities in web servers and VPN appliances.' },
+      { id: 'T1059', name: 'Command and Scripting Interpreter', tactics: ['execution'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT28 uses PowerShell, VBScript, and batch scripts to execute payloads.' },
+      { id: 'T1053', name: 'Scheduled Task/Job', tactics: ['execution', 'persistence', 'privilege-escalation'], platforms: ['Windows', 'Linux', 'macOS'], description: 'APT28 establishes persistence using Windows scheduled tasks.' },
+      { id: 'T1003', name: 'OS Credential Dumping', tactics: ['credential-access'], platforms: ['Windows', 'Linux', 'macOS'], description: 'APT28 uses Mimikatz and custom tools to dump credentials from LSASS.' },
+      { id: 'T1071', name: 'Application Layer Protocol', tactics: ['command-and-control'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT28 uses HTTP, HTTPS, and DNS for C2 communications.' },
+      { id: 'T1021', name: 'Remote Services', tactics: ['lateral-movement'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT28 uses RDP and SSH for lateral movement within victim networks.' },
+      { id: 'T1083', name: 'File and Directory Discovery', tactics: ['discovery'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT28 enumerates file systems to identify target data.' },
+      { id: 'T1041', name: 'Exfiltration Over C2 Channel', tactics: ['exfiltration'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT28 exfiltrates collected data over the same channel used for C2.' },
+    ],
+  },
+
+  '/api/actors/G0032': {
+    id: 'G0032', external_id: 'G0032', name: 'Lazarus Group',
+    aliases: ['HIDDEN COBRA', 'Zinc', 'Labyrinth Chollima', 'Whois Hacking Team'],
+    country: 'DPRK',
+    description: 'Lazarus Group is attributed to North Korea\'s RGB (Reconnaissance General Bureau). Active since at least 2009, the group conducts both financially-motivated operations (notably the 2016 Bangladesh Bank heist and cryptocurrency thefts) and destructive cyber attacks. Responsible for WannaCry ransomware, the Sony Pictures breach, and multiple SWIFT banking attacks.',
+    notes: '',
+    techniques: [
+      { id: 'T1189', name: 'Drive-by Compromise', tactics: ['initial-access'], platforms: ['Windows', 'Linux', 'macOS'], description: 'Lazarus has conducted watering hole attacks targeting financial sector and cryptocurrency platforms.' },
+      { id: 'T1195', name: 'Supply Chain Compromise', tactics: ['initial-access'], platforms: ['Linux', 'macOS', 'Windows'], description: 'Lazarus compromised software supply chains including a financial software vendor update mechanism.' },
+      { id: 'T1059', name: 'Command and Scripting Interpreter', tactics: ['execution'], platforms: ['Linux', 'macOS', 'Windows'], description: 'Lazarus uses PowerShell and custom shell scripts to execute payloads.' },
+      { id: 'T1486', name: 'Data Encrypted for Impact', tactics: ['impact'], platforms: ['Linux', 'macOS', 'Windows'], description: 'Lazarus deployed WannaCry ransomware and custom wipers to disrupt target networks.' },
+      { id: 'T1055', name: 'Process Injection', tactics: ['defense-evasion', 'privilege-escalation'], platforms: ['Linux', 'Windows', 'macOS'], description: 'Lazarus uses process injection to hide malicious code within legitimate processes.' },
+      { id: 'T1048', name: 'Exfiltration Over Alternative Protocol', tactics: ['exfiltration'], platforms: ['Linux', 'macOS', 'Windows'], description: 'Lazarus uses custom protocols to blend exfiltration traffic with legitimate communications.' },
+      { id: 'T1036', name: 'Masquerading', tactics: ['defense-evasion'], platforms: ['Linux', 'macOS', 'Windows'], description: 'Lazarus disguises malware as legitimate software and uses fake digital signatures.' },
+      { id: 'T1070', name: 'Indicator Removal', tactics: ['defense-evasion'], platforms: ['Linux', 'macOS', 'Windows'], description: 'Lazarus clears Windows Event Logs and deletes tools after operations to impede forensics.' },
+    ],
+  },
+
+  '/api/actors/G0096': {
+    id: 'G0096', external_id: 'G0096', name: 'APT41',
+    aliases: ['BARIUM', 'Winnti', 'Double Dragon', 'Bronze Atlas', 'Wicked Spider'],
+    country: 'China',
+    description: 'APT41 is a Chinese state-sponsored threat actor uniquely conducting both espionage and financially-motivated intrusions. Active since at least 2012, APT41 targets healthcare, telecommunications, technology, and video game companies. The group has exploited zero-days in Citrix, Cisco, and Zoho, and is known for supply chain attacks via compromised software vendors.',
+    notes: '',
+    techniques: [
+      { id: 'T1190', name: 'Exploit Public-Facing Application', tactics: ['initial-access'], platforms: ['Linux', 'Windows', 'macOS'], description: 'APT41 has exploited zero-day vulnerabilities in Citrix NetScaler, Cisco routers, and Zoho ManageEngine.' },
+      { id: 'T1133', name: 'External Remote Services', tactics: ['initial-access', 'persistence'], platforms: ['Windows', 'Linux'], description: 'APT41 leverages compromised VPN and RDP credentials to gain persistent access.' },
+      { id: 'T1059', name: 'Command and Scripting Interpreter', tactics: ['execution'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT41 heavily uses PowerShell, Python, and cmd.exe for execution.' },
+      { id: 'T1082', name: 'System Information Discovery', tactics: ['discovery'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT41 conducts extensive reconnaissance to understand victim network architecture.' },
+      { id: 'T1078', name: 'Valid Accounts', tactics: ['defense-evasion', 'initial-access', 'persistence', 'privilege-escalation'], platforms: ['Windows', 'Linux', 'macOS'], description: 'APT41 uses stolen credentials to maintain persistent access and avoid detection.' },
+      { id: 'T1005', name: 'Data from Local System', tactics: ['collection'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT41 collects intellectual property, source code, and PII from victim systems.' },
+      { id: 'T1041', name: 'Exfiltration Over C2 Channel', tactics: ['exfiltration'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT41 stages and exfiltrates collected data through established C2 infrastructure.' },
+      { id: 'T1195', name: 'Supply Chain Compromise', tactics: ['initial-access'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT41 has compromised software update mechanisms to deliver malware to downstream customers.' },
+      { id: 'T1003', name: 'OS Credential Dumping', tactics: ['credential-access'], platforms: ['Windows', 'Linux', 'macOS'], description: 'APT41 uses credential dumping tools to escalate privileges and enable lateral movement.' },
+      { id: 'T1027', name: 'Obfuscated Files or Information', tactics: ['defense-evasion'], platforms: ['Linux', 'macOS', 'Windows'], description: 'APT41 uses code packing and obfuscation to evade security tools.' },
+    ],
   },
 
   '/api/reports': {
