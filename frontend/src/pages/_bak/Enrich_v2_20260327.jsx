@@ -5,18 +5,6 @@ import RiskBadge from '../components/RiskBadge'
 const DEMO = import.meta.env.VITE_DEMO_MODE === 'true'
 
 // ---------------------------------------------------------------------------
-// Plain-language risk explanations (for non-CTI readers)
-// ---------------------------------------------------------------------------
-
-const RISK_PLAIN = {
-  CRITICAL: 'This indicator is actively malicious. Do not interact with it. Block immediately.',
-  HIGH: 'Strong evidence of malicious activity. Treat as hostile unless proven otherwise.',
-  MEDIUM: 'Suspicious signals detected. Investigate before allowing access.',
-  LOW: 'Minor flags — possibly a false positive. Worth a second look.',
-  UNKNOWN: 'No data returned from any source. Could be clean, could be new. Verify manually.',
-}
-
-// ---------------------------------------------------------------------------
 // Source indicator pills
 // ---------------------------------------------------------------------------
 
@@ -101,18 +89,6 @@ function ResultRow({ result, onTag }) {
       {/* Expanded detail */}
       {open && (
         <div className="border-t border-bg-border px-5 py-4 grid grid-cols-1 gap-4 bg-bg-elevated/40">
-          {/* Plain-language verdict — for non-CTI readers */}
-          <div
-            className="rounded-lg px-4 py-2.5 text-sm border"
-            style={{
-              backgroundColor: 'rgba(99,102,241,0.06)',
-              borderColor: 'rgba(99,102,241,0.18)',
-              color: '#C7D2FE',
-            }}
-          >
-            <span className="font-medium">What this means: </span>
-            {RISK_PLAIN[risk] || RISK_PLAIN.UNKNOWN}
-          </div>
           <div className="grid grid-cols-3 gap-4">
             {/* VirusTotal */}
             <div className="rounded-lg border border-bg-border p-4">
@@ -352,49 +328,6 @@ function KeyPanel() {
 // Main page
 // ---------------------------------------------------------------------------
 
-function AboutBanner() {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="mb-4 rounded-xl border border-bg-border bg-bg-surface/50">
-      <button
-        className="w-full flex items-center justify-between px-5 py-3 text-left"
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="text-sm text-text-secondary">What is IOC Enrichment?</span>
-        <span className="text-text-muted text-xs">{open ? 'Less ▲' : 'More ▼'}</span>
-      </button>
-      {open && (
-        <div className="px-5 pb-4 border-t border-bg-border pt-3 grid grid-cols-3 gap-6">
-          <div>
-            <p className="text-xs font-semibold text-text-primary mb-1">What you're doing</p>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              You're submitting suspicious internet addresses, website names, or file fingerprints to three threat intelligence databases simultaneously. Each source scores how dangerous the indicator is based on reports from security researchers worldwide.
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-text-primary mb-1">The three sources</p>
-            <ul className="text-xs text-text-secondary leading-relaxed space-y-1">
-              <li><span className="text-accent-400">VirusTotal</span> — 70+ antivirus engines scan the indicator and vote malicious/clean</li>
-              <li><span className="text-accent-400">AbuseIPDB</span> — community database of IPs reported for spam, hacking, or abuse</li>
-              <li><span className="text-accent-400">GreyNoise</span> — identifies IPs that are actively scanning the internet (background noise vs targeted attack)</li>
-            </ul>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-text-primary mb-1">Risk levels</p>
-            <ul className="text-xs text-text-secondary leading-relaxed space-y-1">
-              <li><span className="text-red-400 font-mono">CRITICAL</span> — Block immediately</li>
-              <li><span className="text-orange-400 font-mono">HIGH</span> — Treat as hostile</li>
-              <li><span className="text-yellow-400 font-mono">MEDIUM</span> — Investigate further</li>
-              <li><span className="text-green-400 font-mono">LOW</span> — Minor flags, verify</li>
-              <li><span className="text-gray-400 font-mono">UNKNOWN</span> — No data found</li>
-            </ul>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
 export default function Enrich() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -421,8 +354,6 @@ export default function Enrich() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold text-text-primary">IOC Enrichment</h1>
       </div>
-
-      <AboutBanner />
 
       {/* API key panel — hidden in demo mode */}
       {!DEMO && <KeyPanel />}

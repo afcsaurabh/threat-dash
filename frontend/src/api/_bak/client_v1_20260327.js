@@ -33,11 +33,6 @@ export const api = {
   // Health
   health: () => request('/api/health'),
 
-  // API key management (local dev only — no-op in demo mode)
-  getKeys: () => request('/api/keys'),
-  setKeys: (keys) =>
-    request('/api/keys', { method: 'POST', body: JSON.stringify(keys) }),
-
   // Phase 1 — Enrichment
   enrich: (iocs) =>
     request('/api/enrich', { method: 'POST', body: JSON.stringify({ iocs }) }),

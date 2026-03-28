@@ -10,7 +10,7 @@ import os
 
 from backend.config import settings
 from backend.database import init_db
-from backend.routers import enrich, feeds, actors, reports, keys
+from backend.routers import enrich, feeds, actors, reports
 
 app = FastAPI(
     title="threat-dash API",
@@ -30,7 +30,6 @@ app.include_router(enrich.router, prefix="/api")
 app.include_router(feeds.router, prefix="/api")
 app.include_router(actors.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
-app.include_router(keys.router, prefix="/api")
 
 
 @app.on_event("startup")

@@ -30,7 +30,6 @@ app.include_router(enrich.router, prefix="/api")
 app.include_router(feeds.router, prefix="/api")
 app.include_router(actors.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
-app.include_router(keys.router, prefix="/api")
 
 
 @app.on_event("startup")

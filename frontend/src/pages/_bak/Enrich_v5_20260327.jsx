@@ -422,8 +422,6 @@ export default function Enrich() {
         <h1 className="text-xl font-semibold text-text-primary">IOC Enrichment</h1>
       </div>
 
-      <AboutBanner />
-
       {/* API key panel — hidden in demo mode */}
       {!DEMO && <KeyPanel />}
 
