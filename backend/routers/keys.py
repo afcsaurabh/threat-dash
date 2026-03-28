@@ -16,6 +16,7 @@ class KeysPayload(BaseModel):
     virustotal_api_key: str = ""
     abuseipdb_api_key: str = ""
     greynoise_api_key: str = ""
+    anthropic_api_key: str = ""
 
 
 @router.post("/keys")
@@ -27,6 +28,8 @@ async def set_keys(body: KeysPayload):
         settings.abuseipdb_api_key = body.abuseipdb_api_key
     if body.greynoise_api_key:
         settings.greynoise_api_key = body.greynoise_api_key
+    if body.anthropic_api_key:
+        settings.anthropic_api_key = body.anthropic_api_key
     return _key_status()
 
 
@@ -41,4 +44,5 @@ def _key_status() -> dict:
         "virustotal": bool(settings.virustotal_api_key),
         "abuseipdb": bool(settings.abuseipdb_api_key),
         "greynoise": bool(settings.greynoise_api_key),
+        "anthropic": bool(settings.anthropic_api_key),
     }

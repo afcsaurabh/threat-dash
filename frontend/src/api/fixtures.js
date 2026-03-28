@@ -253,7 +253,90 @@ export const fixtures = {
   },
 
   '/api/reports': {
-    reports: [],
+    reports: [
+      {
+        id: 1,
+        title: 'APT28 Threat Assessment — Q1 2026',
+        actor_id: 'G0007',
+        actor_profile: {
+          name: 'APT28',
+          aliases: ['Fancy Bear', 'Sofacy', 'IRON TWILIGHT'],
+          country: 'Russia',
+          description: 'APT28 is a threat group attributed to Russia\'s GRU 85th Main Special Service Center (GTsSS), military unit 26165. Active since at least 2004.',
+        },
+        has_summary: 1,
+        created_at: '2026-03-27T10:00:00Z',
+        updated_at: '2026-03-27T10:15:00Z',
+      },
+      {
+        id: 2,
+        title: 'Lazarus Group — Cryptocurrency Campaign',
+        actor_id: 'G0032',
+        actor_profile: {
+          name: 'Lazarus Group',
+          aliases: ['HIDDEN COBRA', 'Zinc'],
+          country: 'DPRK',
+          description: 'Lazarus Group is attributed to North Korea\'s RGB. Known for financially-motivated operations and destructive attacks.',
+        },
+        has_summary: 0,
+        created_at: '2026-03-26T14:30:00Z',
+        updated_at: '2026-03-26T14:30:00Z',
+      },
+    ],
+  },
+
+  '/api/reports/1': {
+    id: 1,
+    title: 'APT28 Threat Assessment — Q1 2026',
+    actor_id: 'G0007',
+    actor_profile: {
+      name: 'APT28',
+      aliases: ['Fancy Bear', 'Sofacy', 'IRON TWILIGHT', 'Sednit'],
+      country: 'Russia',
+      description: 'APT28 is a threat group attributed to Russia\'s GRU 85th Main Special Service Center (GTsSS), military unit 26165. Active since at least 2004, APT28 targets government, military, and security organisations primarily in Europe and NATO member states.',
+    },
+    exec_summary: 'APT28 (also known as Fancy Bear and Sofacy) is a sophisticated threat actor attributed to Russia\'s General Staff Main Intelligence Directorate (GRU), specifically military unit 26165. The group has been active since at least 2004 and primarily targets government, military, and security organisations across NATO member states and Eastern Europe. Attribution is assessed with high confidence based on consistent tooling, infrastructure patterns, and targeting consistent with Russian strategic interests.\n\nAPT28\'s primary initial access vectors include spear-phishing campaigns (T1566) and exploitation of internet-facing services (T1190). Once inside a target network, the group leverages valid credentials (T1078) to maintain persistence and move laterally via Remote Services (T1021). The group\'s signature toolset includes X-Agent, Sofacy, and custom implants designed to evade endpoint detection.\n\nKey indicators of compromise associated with APT28 include malicious infrastructure hosted across commercial VPN providers and compromised third-party hosting. The group routinely rotates C2 infrastructure to frustrate attribution and blocking efforts. Defenders should monitor for credential reuse, anomalous use of remote services, and scheduled tasks created outside normal change windows.\n\nDefensive priorities include hardening phishing resilience through user training and email authentication controls (DMARC, DKIM, SPF), deploying multi-factor authentication across all remote access pathways, and monitoring for credential dumping activity (T1003) on domain controllers. Organisations in government, defence, and critical infrastructure sectors should treat APT28 as an active threat and review ATT&CK coverage gaps against their current security controls.',
+    ttps_json: [
+      { technique_id: 'T1566', name: 'Phishing', tactics: ['initial-access'] },
+      { technique_id: 'T1078', name: 'Valid Accounts', tactics: ['defense-evasion', 'initial-access', 'persistence'] },
+      { technique_id: 'T1190', name: 'Exploit Public-Facing Application', tactics: ['initial-access'] },
+      { technique_id: 'T1059', name: 'Command and Scripting Interpreter', tactics: ['execution'] },
+      { technique_id: 'T1003', name: 'OS Credential Dumping', tactics: ['credential-access'] },
+      { technique_id: 'T1071', name: 'Application Layer Protocol', tactics: ['command-and-control'] },
+      { technique_id: 'T1021', name: 'Remote Services', tactics: ['lateral-movement'] },
+      { technique_id: 'T1041', name: 'Exfiltration Over C2 Channel', tactics: ['exfiltration'] },
+    ],
+    iocs_json: [
+      { ioc: '185.220.101.47', type: 'ip', risk: 'CRITICAL' },
+      { ioc: 'sofacy-update[.]com', type: 'domain', risk: 'HIGH' },
+    ],
+    mitigations: '',
+    analyst_notes: 'Targeting pattern consistent with strategic intelligence gathering ahead of NATO summit. Priority: monitor for spear-phishing targeting defence ministry contacts.',
+    created_at: '2026-03-27T10:00:00Z',
+    updated_at: '2026-03-27T10:15:00Z',
+  },
+
+  '/api/reports/2': {
+    id: 2,
+    title: 'Lazarus Group — Cryptocurrency Campaign',
+    actor_id: 'G0032',
+    actor_profile: {
+      name: 'Lazarus Group',
+      aliases: ['HIDDEN COBRA', 'Zinc', 'Labyrinth Chollima'],
+      country: 'DPRK',
+      description: 'Lazarus Group is attributed to North Korea\'s RGB. Known for financially-motivated operations and destructive attacks.',
+    },
+    exec_summary: '',
+    ttps_json: [
+      { technique_id: 'T1189', name: 'Drive-by Compromise', tactics: ['initial-access'] },
+      { technique_id: 'T1195', name: 'Supply Chain Compromise', tactics: ['initial-access'] },
+      { technique_id: 'T1486', name: 'Data Encrypted for Impact', tactics: ['impact'] },
+    ],
+    iocs_json: [],
+    mitigations: '',
+    analyst_notes: '',
+    created_at: '2026-03-26T14:30:00Z',
+    updated_at: '2026-03-26T14:30:00Z',
   },
 }
 
