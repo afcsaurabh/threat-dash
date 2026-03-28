@@ -49,6 +49,30 @@ async def health():
     }
 
 
+@app.get("/api/dashboard")
+async def get_dashboard(
+    country: str = None,
+    sector: str = None,
+    days: int = 7,
+    category: str = None,
+):
+    from backend.services import attck as attck_svc
+    from backend.services import news as news_svc
+
+    actors = attck_svc.get_top_actors(country=country, sector=sector, limit=10)
+    targets = attck_svc.get_target_summary()
+    country_map = attck_svc.get_country_actor_map()
+    news_data = news_svc.query_news(category=category or None, limit=10)
+
+    return {
+        "actors": actors,
+        "targets": targets,
+        "country_actor_map": country_map,
+        "news": news_data["articles"],
+        "empty": len(actors) == 0,
+    }
+
+
 # Serve React build in production (when frontend/dist exists)
 frontend_dist = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 if os.path.isdir(frontend_dist):

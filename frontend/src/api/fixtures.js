@@ -87,6 +87,7 @@ export const fixtures = {
         summary: '',
         score: 312,
         author: 'secresearcher',
+        categories: 'ransomware,vulnerabilities',
       },
       {
         article_id: 'krebs:def456',
@@ -97,6 +98,7 @@ export const fixtures = {
         summary: 'Attackers gained access to the exchange\'s hot wallet through a supply-chain compromise of a third-party signing library, draining approximately $45 million in mixed cryptocurrency assets.',
         score: 0,
         author: 'Brian Krebs',
+        categories: 'data-breach',
       },
       {
         article_id: 'cisa:ghi789',
@@ -107,6 +109,7 @@ export const fixtures = {
         summary: 'CISA has added a critical Ivanti Connect Secure vulnerability to its KEV catalog. Federal agencies are required to remediate by April 14.',
         score: 0,
         author: 'CISA',
+        categories: 'government,vulnerabilities',
       },
       {
         article_id: 'bleepingcomputer:jkl012',
@@ -117,6 +120,7 @@ export const fixtures = {
         summary: 'The BlackLock ransomware group added a major European logistics provider to their data leak site, claiming to have exfiltrated over 4TB of files including contracts and employee records.',
         score: 0,
         author: 'BleepingComputer',
+        categories: 'ransomware,data-breach',
       },
       {
         article_id: 'cyberscoop:mno345',
@@ -127,6 +131,7 @@ export const fixtures = {
         summary: 'A new executive order mandates minimum cybersecurity baselines for operators of critical infrastructure across 16 sectors, with compliance deadlines ranging from 90 to 180 days.',
         score: 0,
         author: 'CyberScoop Staff',
+        categories: 'government',
       },
       {
         article_id: 'thehackernews:pqr678',
@@ -137,6 +142,7 @@ export const fixtures = {
         summary: 'Security researchers disclosed a new UEFI bootkit affecting multiple enterprise laptop manufacturers. The implant survives OS reinstalls and is attributed to a nation-state actor.',
         score: 0,
         author: 'THN',
+        categories: 'nation-state,incident',
       },
     ],
     total: 6,
@@ -159,6 +165,96 @@ export const fixtures = {
       cisa:             { count: 20, last_fetch: '2026-03-27T09:00:00Z' },
       thehackernews:    { count: 30, last_fetch: '2026-03-27T09:00:00Z' },
     },
+  },
+
+  '/api/dashboard': {
+    actors: [
+      { id: 'G0096', name: 'APT41',        country: 'CN', technique_count: 130, aliases: ['Double Dragon', 'Winnti'] },
+      { id: 'G0007', name: 'APT28',        country: 'RU', technique_count: 72,  aliases: ['Fancy Bear'] },
+      { id: 'G0010', name: 'Turla',        country: 'RU', technique_count: 70,  aliases: ['Venomous Bear', 'IRON HUNTER'] },
+      { id: 'G0032', name: 'Lazarus Group',country: 'KP', technique_count: 61,  aliases: ['Hidden Cobra'] },
+      { id: 'G0016', name: 'APT29',        country: 'RU', technique_count: 56,  aliases: ['Cozy Bear', 'The Dukes'] },
+      { id: 'G0050', name: 'APT32',        country: 'VN', technique_count: 53,  aliases: ['OceanLotus'] },
+      { id: 'G0065', name: 'Leviathan',    country: 'CN', technique_count: 40,  aliases: ['TEMP.Periscope'] },
+      { id: 'G0064', name: 'APT33',        country: 'IR', technique_count: 38,  aliases: ['Elfin', 'Refined Kitten'] },
+      { id: 'G0087', name: 'APT39',        country: 'IR', technique_count: 34,  aliases: ['Chafer', 'Remix Kitten'] },
+      { id: 'G0006', name: 'APT1',         country: 'CN', technique_count: 30,  aliases: ['Comment Crew'] },
+    ],
+    targets: {
+      sectors: [
+        { sector: 'government',          count: 42 },
+        { sector: 'financial-services',  count: 28 },
+        { sector: 'defense',             count: 25 },
+        { sector: 'technology',          count: 21 },
+        { sector: 'healthcare',          count: 15 },
+        { sector: 'energy',              count: 12 },
+        { sector: 'telecommunications',  count: 9  },
+        { sector: 'education',           count: 7  },
+      ],
+      named_orgs: [],
+    },
+    country_actor_map: {
+      RU: ['APT28', 'APT29', 'Sandworm Team', 'Turla', 'Wizard Spider'],
+      CN: ['APT1', 'APT10', 'APT40', 'APT41', 'Leviathan'],
+      KP: ['Lazarus Group', 'Kimsuky', 'APT37', 'APT38'],
+      IR: ['APT33', 'APT34', 'Charming Kitten', 'APT39'],
+      VN: ['APT32'],
+      US: ['Equation'],
+    },
+    news: [
+      {
+        article_id: 'hackernews:abc123',
+        title: 'New ransomware group exploiting unpatched Fortinet VPNs in targeted attacks',
+        url: 'https://news.ycombinator.com/item?id=99999',
+        source: 'hackernews', published_at: '2026-03-27T06:30:00Z',
+        summary: '', score: 312, author: 'secresearcher', categories: 'ransomware,vulnerabilities',
+      },
+      {
+        article_id: 'cisa:ghi789',
+        title: 'CISA Adds CVE-2026-1234 to Known Exploited Vulnerabilities Catalog',
+        url: 'https://www.cisa.gov/known-exploited-vulnerabilities-catalog',
+        source: 'cisa', published_at: '2026-03-26T14:00:00Z',
+        summary: 'CISA has added a critical Ivanti Connect Secure vulnerability to its KEV catalog.',
+        score: 0, author: 'CISA', categories: 'government,vulnerabilities',
+      },
+      {
+        article_id: 'bleepingcomputer:jkl012',
+        title: 'BlackLock ransomware claims attack on European logistics firm, leaks 4TB of data',
+        url: 'https://www.bleepingcomputer.com',
+        source: 'bleepingcomputer', published_at: '2026-03-26T10:30:00Z',
+        summary: 'The BlackLock ransomware group added a major European logistics provider to their data leak site.',
+        score: 0, author: 'BleepingComputer', categories: 'ransomware,data-breach',
+      },
+      {
+        article_id: 'thehackernews:pqr678',
+        title: 'Researchers uncover novel rootkit hiding in UEFI firmware of enterprise laptops',
+        url: 'https://thehackernews.com',
+        source: 'thehackernews', published_at: '2026-03-25T09:00:00Z',
+        summary: 'Security researchers disclosed a new UEFI bootkit attributed to a nation-state actor.',
+        score: 0, author: 'THN', categories: 'nation-state,incident',
+      },
+      {
+        article_id: 'cyberscoop:mno345',
+        title: 'White House cybersecurity directive targets critical infrastructure operators',
+        url: 'https://cyberscoop.com',
+        source: 'cyberscoop', published_at: '2026-03-25T16:00:00Z',
+        summary: 'A new executive order mandates minimum cybersecurity baselines for 16 critical sectors.',
+        score: 0, author: 'CyberScoop Staff', categories: 'government',
+      },
+    ],
+    empty: false,
+  },
+
+  '/api/actors/targets': {
+    sectors: [
+      { sector: 'government',          count: 42 },
+      { sector: 'financial-services',  count: 28 },
+      { sector: 'defense',             count: 25 },
+      { sector: 'technology',          count: 21 },
+      { sector: 'healthcare',          count: 15 },
+      { sector: 'energy',              count: 12 },
+    ],
+    named_orgs: [],
   },
 
   '/api/actors/stats': {
@@ -345,8 +441,10 @@ export const fixtures = {
  * Supports exact match and prefix match for parameterised routes.
  */
 export function getFixture(path) {
-  if (fixtures[path]) return fixtures[path]
+  // Strip query string before lookup
+  const clean = path.split('?')[0]
+  if (fixtures[clean]) return fixtures[clean]
   // Strip trailing path segments for parameterised routes
-  const base = '/' + path.split('/').slice(1, 3).join('/')
+  const base = '/' + clean.split('/').slice(1, 3).join('/')
   return fixtures[base] ?? { message: 'No fixture for this route in demo mode.' }
 }

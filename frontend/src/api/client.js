@@ -77,6 +77,13 @@ export const api = {
   saveNotes: (id, notes) =>
     request(`/api/actors/${id}/notes`, { method: 'POST', body: JSON.stringify({ notes }) }),
 
+  // Phase 5 — Dashboard
+  getDashboard: (params = {}) => {
+    const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== ''))
+    return request(`/api/dashboard${qs.toString() ? '?' + qs : ''}`)
+  },
+  getTargets: () => request('/api/actors/targets'),
+
   // Phase 4 — Reports
   createReport: (body) =>
     request('/api/reports', { method: 'POST', body: JSON.stringify(body) }),

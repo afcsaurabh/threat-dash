@@ -313,6 +313,112 @@ def save_notes(actor_id: str, notes: str) -> dict:
     return {"actor_id": actor_id, "saved": True}
 
 
+def get_top_actors(country: str = None, sector: str = None, limit: int = 10) -> list[dict]:
+    """Return top actors by technique count, optionally filtered by country or targeted sector."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT ag.stix_id, ag.external_id, ag.name, ag.aliases,
+                   ag.country, COUNT(at2.technique_stix_id) AS technique_count
+            FROM actor_groups ag
+            LEFT JOIN actor_techniques at2 ON at2.actor_stix_id = ag.stix_id
+            GROUP BY ag.stix_id
+            ORDER BY technique_count DESC
+            LIMIT 100
+            """
+        ).fetchall()
+
+        sector_stix_ids: set[str] | None = None
+        if sector:
+            sector_rows = conn.execute(
+                "SELECT DISTINCT actor_stix_id FROM actor_targets WHERE target_sector LIKE ?",
+                (f"%{sector}%",),
+            ).fetchall()
+            sector_stix_ids = {r[0] for r in sector_rows}
+
+    actors = []
+    for r in rows:
+        if country and r["country"] != country:
+            continue
+        if sector_stix_ids is not None and r["stix_id"] not in sector_stix_ids:
+            continue
+        actors.append({
+            "id": r["external_id"] or r["stix_id"],
+            "name": r["name"],
+            "country": r["country"],
+            "technique_count": r["technique_count"],
+            "aliases": json.loads(r["aliases"] or "[]"),
+        })
+        if len(actors) >= limit:
+            break
+
+    return actors
+
+
+def get_target_summary() -> dict:
+    """Return top targeted sectors and named orgs across all actors."""
+    with get_connection() as conn:
+        sector_rows = conn.execute(
+            """
+            SELECT target_sector, COUNT(*) as cnt
+            FROM actor_targets
+            WHERE target_sector != '' AND target_sector IS NOT NULL
+            GROUP BY target_sector
+            ORDER BY cnt DESC
+            LIMIT 30
+            """
+        ).fetchall()
+
+        org_rows = conn.execute(
+            """
+            SELECT at.target_name, at.target_sector, ag.name as actor_name
+            FROM actor_targets at
+            JOIN actor_groups ag ON ag.stix_id = at.actor_stix_id
+            WHERE at.target_type = 'organization' AND at.target_name != ''
+            ORDER BY ag.name
+            LIMIT 20
+            """
+        ).fetchall()
+
+    # Expand comma-separated sectors and aggregate counts
+    sector_counts: dict[str, int] = {}
+    for r in sector_rows:
+        for s in (r["target_sector"] or "").split(","):
+            s = s.strip()
+            if s:
+                sector_counts[s] = sector_counts.get(s, 0) + r["cnt"]
+
+    sectors = sorted(
+        [{"sector": k, "count": v} for k, v in sector_counts.items()],
+        key=lambda x: x["count"],
+        reverse=True,
+    )[:10]
+
+    return {
+        "sectors": sectors,
+        "named_orgs": [
+            {
+                "name": r["target_name"],
+                "sector": r["target_sector"],
+                "actor": r["actor_name"],
+            }
+            for r in org_rows
+        ],
+    }
+
+
+def get_country_actor_map() -> dict[str, list[str]]:
+    """Return mapping of country code → list of actor names (for map panel)."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT name, country FROM actor_groups WHERE country IS NOT NULL"
+        ).fetchall()
+    result: dict[str, list[str]] = {}
+    for r in rows:
+        result.setdefault(r["country"], []).append(r["name"])
+    return result
+
+
 def get_navigator_layer(external_id: str) -> dict | None:
     actor = get_actor(external_id)
     if not actor:

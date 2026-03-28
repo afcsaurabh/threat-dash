@@ -19,6 +19,11 @@ async def actor_stats():
     return attck.get_actor_stats()
 
 
+@router.get("/actors/targets")
+async def get_targets():
+    return attck.get_target_summary()
+
+
 @router.post("/actors/refresh")
 async def refresh_actors():
     result = await attck.refresh_attck()

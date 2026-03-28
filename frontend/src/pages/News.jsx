@@ -1,9 +1,20 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
+
+const CATEGORY_META = {
+  ransomware:     { label: 'Ransomware',          color: '#EF4444' },
+  'nation-state': { label: 'Nation-State / APT',  color: '#8B5CF6' },
+  vulnerabilities:{ label: 'Vulnerabilities',     color: '#F59E0B' },
+  'data-breach':  { label: 'Data Breaches',       color: '#EC4899' },
+  government:     { label: 'Gov / Policy',        color: '#3B82F6' },
+  incident:       { label: 'Incident Reports',    color: '#10B981' },
+  uncategorized:  { label: 'Uncategorized',       color: '#6B7280' },
+}
 
 const SOURCE_META = {
   hackernews:       { label: 'Hacker News',        color: '#FB923C' },
@@ -30,13 +41,17 @@ function timeAgo(ts) {
   return `${Math.floor(diff / 86400)}d ago`
 }
 
-function SourcePill({ source, active, onClick }) {
-  const meta = SOURCE_META[source]
+// ---------------------------------------------------------------------------
+// Pill + badge components
+// ---------------------------------------------------------------------------
+
+function CategoryPill({ id, active, onClick }) {
+  const meta = CATEGORY_META[id]
   if (!meta) return null
   return (
     <button
-      onClick={() => onClick(source)}
-      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+      onClick={() => onClick(id)}
+      className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors"
       style={
         active
           ? { backgroundColor: meta.color + '25', color: meta.color, border: `1px solid ${meta.color}55` }
@@ -60,12 +75,35 @@ function SourceBadge({ source }) {
   )
 }
 
+function CategoryBadge({ categories }) {
+  if (!categories) return null
+  const cats = categories.split(',').filter(Boolean).filter((c) => c !== 'uncategorized')
+  if (!cats.length) return null
+  return (
+    <>
+      {cats.slice(0, 2).map((c) => {
+        const meta = CATEGORY_META[c]
+        if (!meta) return null
+        return (
+          <span
+            key={c}
+            className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium"
+            style={{ backgroundColor: meta.color + '18', color: meta.color }}
+          >
+            {meta.label}
+          </span>
+        )
+      })}
+    </>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Article card
 // ---------------------------------------------------------------------------
 
 function ArticleCard({ article }) {
-  const { title, url, source, published_at, summary, score, author } = article
+  const { title, url, source, published_at, summary, score, author, categories } = article
 
   return (
     <div className="border border-bg-border rounded-xl p-4 mb-3 bg-bg-surface hover:border-accent-500/40 transition-colors">
@@ -84,8 +122,9 @@ function ArticleCard({ article }) {
             <p className="text-xs text-text-secondary leading-relaxed mb-2 line-clamp-2">{summary}</p>
           )}
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <SourceBadge source={source} />
+            <CategoryBadge categories={categories} />
 
             {score > 0 && (
               <span className="text-[11px] text-text-muted font-mono">▲ {score}</span>
@@ -117,67 +156,26 @@ function ArticleCard({ article }) {
 }
 
 // ---------------------------------------------------------------------------
-// Explainer
-// ---------------------------------------------------------------------------
-
-function Explainer() {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="mb-4 rounded-xl border border-bg-border bg-bg-surface/50">
-      <button
-        className="w-full flex items-center justify-between px-5 py-3 text-left"
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="text-sm text-text-secondary">About these sources</span>
-        <span className="text-text-muted text-xs">{open ? 'Less ▲' : 'More ▼'}</span>
-      </button>
-      {open && (
-        <div className="px-5 pb-4 border-t border-bg-border pt-3 grid grid-cols-3 gap-5">
-          <div>
-            <p className="text-xs font-semibold text-text-primary mb-1">Hacker News</p>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              Security-relevant stories from the Y Combinator community, ranked by upvotes. Often surfaces
-              disclosures, novel research, and tools before mainstream outlets pick them up.
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-text-primary mb-1">Trade press</p>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              CyberScoop covers policy and enterprise security. Krebs on Security is a long-running
-              investigative outlet specialising in cybercrime and fraud. BleepingComputer tracks
-              active ransomware campaigns in near-real-time.
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-text-primary mb-1">CISA + THN</p>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              CISA advisories are official US government alerts about active exploitation — if something
-              is here, patch it immediately. The Hacker News aggregates broadly across the security beat.
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
 
 export default function News() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const activeCategory = searchParams.get('category') || ''
+
   const [articles, setArticles] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
-  const [activeSource, setActiveSource] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await api.getNews({ source: activeSource || undefined })
+      const data = await api.getNews({
+        category: activeCategory || undefined,
+      })
       setArticles(data.articles || [])
       setTotal(data.total || 0)
     } catch (err) {
@@ -185,7 +183,7 @@ export default function News() {
     } finally {
       setLoading(false)
     }
-  }, [activeSource])
+  }, [activeCategory])
 
   useEffect(() => { load() }, [load])
 
@@ -202,8 +200,16 @@ export default function News() {
     }
   }
 
-  function toggleSource(source) {
-    setActiveSource((s) => (s === source ? '' : source))
+  function toggleCategory(cat) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (next.get('category') === cat) {
+        next.delete('category')
+      } else {
+        next.set('category', cat)
+      }
+      return next
+    })
   }
 
   return (
@@ -220,29 +226,32 @@ export default function News() {
         </div>
       </div>
 
-      <Explainer />
-
       {DEMO && (
         <div className="mb-4 rounded-lg border border-yellow-500/20 bg-yellow-500/5 px-4 py-3 text-sm text-yellow-300">
           Demo mode — showing sample articles. Deploy locally to pull live news feeds.
         </div>
       )}
 
-      {/* Source filter pills */}
+      {/* Category filter pills */}
       <div className="flex items-center gap-2 flex-wrap mb-5">
         <button
-          onClick={() => setActiveSource('')}
+          onClick={() => setSearchParams({})}
           className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors"
           style={
-            !activeSource
+            !activeCategory
               ? { backgroundColor: '#6366F125', color: '#818CF8', border: '1px solid #6366F155' }
               : { backgroundColor: 'transparent', color: '#6B7280', border: '1px solid #374151' }
           }
         >
-          All sources
+          All topics
         </button>
-        {Object.keys(SOURCE_META).map((s) => (
-          <SourcePill key={s} source={s} active={activeSource === s} onClick={toggleSource} />
+        {Object.keys(CATEGORY_META).map((cat) => (
+          <CategoryPill
+            key={cat}
+            id={cat}
+            active={activeCategory === cat}
+            onClick={toggleCategory}
+          />
         ))}
       </div>
 
@@ -271,7 +280,7 @@ export default function News() {
 
       {total > articles.length && !loading && (
         <p className="text-text-muted text-xs mt-3 text-center">
-          Showing {articles.length} of {total.toLocaleString()} — filter by source to narrow results
+          Showing {articles.length} of {total.toLocaleString()} — filter by topic to narrow results
         </p>
       )}
     </div>
